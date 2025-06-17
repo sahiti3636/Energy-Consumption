@@ -1,0 +1,195 @@
+{% extends "app.html" %}
+{% block body %}
+<div class="card fade-in-up">
+    <div class="card-header">
+        <div class="card-icon purple">
+            <i class="fas fa-brain"></i>
+        </div>
+        <div>
+            <h2 class="card-title">Smart Grid Management & Scheduling</h2>
+            <p class="card-subtitle">AI-powered grid optimization and intelligent resource allocation</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div class="stat-value">{{ current_load }}</div>
+            <div class="stat-label">Current Load (kW)</div>
+            <span class="stat-badge blue-light">Real-time</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon {% if status_color == 'red' %}red{% elif status_color == 'green' %}green{% else %}orange{% endif %}">
+                <i class="fas fa-signal"></i>
+            </div>
+            <div class="stat-value" style="font-size: 18px;">{{ grid_status }}</div>
+            <div class="stat-label">Grid Status</div>
+            <span class="stat-badge {% if status_color == 'red' %}red-light{% elif status_color == 'green' %}green-light{% else %}orange-light{% endif %}">Live</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value" style="font-size: 16px;">{{ peak_hours[:3] | join(', ') }}:00</div>
+            <div class="stat-label">Peak Hours</div>
+            <span class="stat-badge green-light">Identified</span>
+        </div>
+    </div>
+</div>
+
+<div class="card fade-in-up" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+    <div class="card-header">
+        <div class="card-icon purple">
+            <i class="fas fa-brain"></i>
+        </div>
+        <div>
+            <h3 class="card-title" style="font-size: 20px;">AI Grid Management Insights</h3>
+        </div>
+    </div>
+    <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #8b5cf6;">
+        <p style="font-style: italic; color: #374151; font-size: 16px; line-height: 1.6;">{{ ai_insights }}</p>
+    </div>
+</div>
+
+<div class="table-container fade-in-up">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Strategy</th>
+                <th>Type</th>
+                <th>Optimal Hours</th>
+                <th>Action</th>
+                <th>AI Recommendation</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for strategy in strategies %}
+            <tr>
+                <td><strong>{{ strategy.Strategy }}</strong></td>
+                <td>
+                    <span class="stat-badge blue-light">{{ strategy.Type }}</span>
+                </td>
+                <td>
+                    {% if strategy.get('Peak Hours') %}
+                        {{ strategy['Peak Hours'][:3] | join(', ') }}:00
+                    {% elif strategy.get('Optimal Hours') %}
+                        {{ strategy['Optimal Hours'][:3] | join(', ') }}:00
+                    {% elif strategy.get('Best Hours') %}
+                        {{ strategy['Best Hours'][:3] | join(', ') }}:00
+                    {% elif strategy.get('Target Hours') %}
+                        {{ strategy['Target Hours'][:3] | join(', ') }}:00
+                    {% endif %}
+                </td>
+                <td>{{ strategy.Action }}</td>
+                <td style="max-width: 200px;">{{ strategy.AI_Recommendation }}</td>
+                <td>
+                    <span class="stat-badge {% if strategy.Priority == 'High' %}red-light{% elif strategy.Priority == 'Medium' %}yellow-light{% else %}green-light{% endif %}">
+                        {{ strategy.Priority }}
+                    </span>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="chart-container fade-in-up">
+    <h3 style="font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 10px;">
+        <i class="fas fa-chart-area" style="color: #4f46e5; margin-right: 10px;"></i>
+        24-Hour Load Distribution
+    </h3>
+    <div class="chart-wrapper">
+        <canvas id="loadChart"></canvas>
+    </div>
+</div>
+
+<div class="action-grid fade-in-up">
+    <button class="action-btn red" onclick="showNotification('Emergency load shedding initiated')">
+        <i class="fas fa-exclamation-triangle"></i>
+        Emergency Load Shed
+    </button>
+    <button class="action-btn green" onclick="showNotification('Battery charging started')">
+        <i class="fas fa-battery-three-quarters"></i>
+        Start Battery Charging
+    </button>
+    <button class="action-btn blue" onclick="showNotification('Generators deployed')">
+        <i class="fas fa-cog"></i>
+        Deploy Generators
+    </button>
+    <button class="action-btn yellow" onclick="showNotification('Renewable energy maximized')">
+        <i class="fas fa-leaf"></i>
+        Maximize Renewables
+    </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('loadChart').getContext('2d');
+const hourlyData = {{ hourly_data | tojson }};
+const peakHours = {{ peak_hours | tojson }};
+const lowLoadHours = {{ low_load_hours | tojson }};
+
+const labels = Object.keys(hourlyData);
+const values = Object.values(hourlyData);
+
+const backgroundColors = labels.map(hour => {
+    const hourNum = parseInt(hour);
+    if (peakHours.includes(hourNum)) return 'rgba(239, 68, 68, 0.8)';
+    if (lowLoadHours.includes(hourNum)) return 'rgba(34, 197, 94, 0.8)';
+    return 'rgba(79, 70, 229, 0.8)';
+});
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels.map(h => h + ':00'),
+        datasets: [{
+            label: 'Load (kW)',
+            data: values,
+            backgroundColor: backgroundColors,
+            borderColor: backgroundColors.map(color => color.replace('0.8', '1')),
+            borderWidth: 2,
+            borderRadius: 8,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: 'white',
+                bodyColor: 'white',
+                cornerRadius: 8,
+                callbacks: {
+                    label: function(context) {
+                        const hour = parseInt(context.label);
+                        let status = 'Medium Load';
+                        if (peakHours.includes(hour)) status = 'Peak Hours';
+                        if (lowLoadHours.includes(hour)) status = 'Low Load';
+                        return `${context.parsed.y} kW (${status})`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color: '#64748b' }
+            },
+            y: {
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { color: '#64748b' },
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

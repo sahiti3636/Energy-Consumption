@@ -1,0 +1,109 @@
+{% extends "app.html" %}
+{% block body %}
+<div class="card fade-in-up">
+    <div class="card-header">
+        <div class="card-icon green">
+            <i class="fas fa-balance-scale"></i>
+        </div>
+        <div>
+            <h2 class="card-title">Grid Load Balancing</h2>
+            <p class="card-subtitle">Monitor and manage hourly load distribution</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">Stable</div>
+            <div class="stat-label">Grid Status</div>
+            <span class="stat-badge green-light">Operational</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Monitoring</div>
+            <span class="stat-badge blue-light">Active</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+            <div class="stat-value">Balanced</div>
+            <div class="stat-label">Load Distribution</div>
+            <span class="stat-badge purple-light">Optimized</span>
+        </div>
+    </div>
+</div>
+
+<div class="table-container fade-in-up">
+    <table class="table">
+        <thead>
+            <tr>
+                <th><i class="fas fa-clock" style="margin-right: 8px; color: #4f46e5;"></i>Hour</th>
+                <th><i class="fas fa-bolt" style="margin-right: 8px; color: #4f46e5;"></i>Expected Load (kW)</th>
+                <th><i class="fas fa-info-circle" style="margin-right: 8px; color: #4f46e5;"></i>Status</th>
+                <th><i class="fas fa-cog" style="margin-right: 8px; color: #4f46e5;"></i>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for hour, load, action in table %}
+            <tr>
+                <td>
+                    <strong style="color: #1e293b;">{{ hour }}:00</strong>
+                </td>
+                <td>
+                    <span style="font-size: 18px; font-weight: 600; color: #1e293b;">{{ load }}</span>
+                </td>
+                <td>
+                    {% if action == "✅ OK" %}
+                        <span class="stat-badge green-light">
+                            <i class="fas fa-check-circle"></i> Normal
+                        </span>
+                    {% else %}
+                        <span class="stat-badge yellow-light">
+                            <i class="fas fa-exclamation-triangle"></i> High Load
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if action == "✅ OK" %}
+                        <button class="btn btn-success" style="padding: 8px 16px; font-size: 14px;" onclick="showNotification('Monitoring hour {{ hour }}')">
+                            <i class="fas fa-eye"></i> Monitor
+                        </button>
+                    {% else %}
+                        <button class="btn btn-warning" style="padding: 8px 16px; font-size: 14px;" onclick="showNotification('Optimizing load for hour {{ hour }}')">
+                            <i class="fas fa-cog"></i> Optimize
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="action-grid fade-in-up">
+    <button class="action-btn blue" onclick="showNotification('Data refreshed successfully')">
+        <i class="fas fa-sync-alt"></i>
+        Refresh Data
+    </button>
+    <button class="action-btn green" onclick="showNotification('Auto-balancing enabled')">
+        <i class="fas fa-balance-scale"></i>
+        Auto Balance
+    </button>
+    <button class="action-btn yellow" onclick="showNotification('Alerts configured')">
+        <i class="fas fa-bell"></i>
+        Set Alerts
+    </button>
+    <button class="action-btn purple" onclick="showNotification('Report generated')">
+        <i class="fas fa-download"></i>
+        Export Report
+    </button>
+</div>
+{% endblock %}
