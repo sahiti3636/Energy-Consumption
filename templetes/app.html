@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Energy Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                Smart Energy Dashboard
+            </div>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="/summary" class="nav-link"><i class="fas fa-chart-line"></i> Summary</a></li>
+                <li><a href="/balancing" class="nav-link"><i class="fas fa-balance-scale"></i> Load Balancing</a></li>
+                <li><a href="/scheduling" class="nav-link"><i class="fas fa-calendar-alt"></i> Grid Management</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block body %}
+        <!-- Home Page Content -->
+        <div class="hero fade-in-up">
+            <h1>Smart Energy Dashboard</h1>
+            <p>Monitor, analyze, and optimize your energy consumption with AI-powered insights and real-time grid management.</p>
+        </div>
+
+        <div class="feature-grid fade-in-up">
+            <div class="feature-card">
+                <div class="feature-icon blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Dynamic Pricing</h3>
+                <p class="feature-description">Analyze peak hours, cost patterns, and optimize your energy spending with real-time pricing insights.</p>
+                <a href="/summary" class="btn btn-primary">View Analysis</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon green">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3 class="feature-title">Load Balancing</h3>
+                <p class="feature-description">Monitor grid load distribution and ensure optimal energy allocation across all hours.</p>
+                <a href="/balancing" class="btn btn-success">Monitor Grid</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon purple">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">AI Grid Management</h3>
+                <p class="feature-description">Leverage AI-powered recommendations for smart scheduling and automated grid optimization.</p>
+                <a href="/scheduling" class="btn btn-primary">Smart Control</a>
+            </div>
+        </div>
+
+        <div class="card fade-in-up">
+            <div class="card-header">
+                <div class="card-icon green">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <div>
+                    <h2 class="card-title">System Status</h2>
+                    <p class="card-subtitle">Real-time monitoring of all systems</p>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">Online</div>
+                    <div class="stat-label">Grid Status</div>
+                    <span class="stat-badge green-light">Active</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-value">Live</div>
+                    <div class="stat-label">Data Stream</div>
+                    <span class="stat-badge blue-light">Connected</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="stat-value">Running</div>
+                    <div class="stat-label">AI Engine</div>
+                    <span class="stat-badge purple-light">Optimizing</span>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon yellow">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-value">Secure</div>
+                    <div class="stat-label">Connection</div>
+                    <span class="stat-badge yellow-light">Protected</span>
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </main>
+
+    <script>
+        // Set active navigation link
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <strong>Action Completed</strong><br>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
