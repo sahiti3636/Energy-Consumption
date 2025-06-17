@@ -1,0 +1,29 @@
+# app.yaml
+runtime: python39 # Or python310, python311, etc., based on your Python version
+env: standard
+
+entrypoint: gunicorn --bind :$PORT app:app
+
+instance_class: F1 # Adjust based on your traffic needs (F1 is free tier eligible)
+
+handlers:
+- url: /static
+  static_dir: static # If you have a 'static' folder for CSS/JS/images
+  
+- url: /.*
+  script: auto
+  secure: always # Forces HTTPS for all requests
+  redirect_http_response_code: 301 # Permanent redirect from HTTP to HTTPS
+
+# Environment variables for your Flask app (e.g., MongoDB URI, Gemini API Key)
+env_variables:
+  GEMINI_API_KEY: "AIzaSyDYoa4ID8dzXRpMh6bOpisqdDx_sjiAOA4" # Replace with your actual key or use Secret Manager
+  MONGO_URI: "mongodb+srv://Cluster65166:c0FecmZsY35x@cluster65166.k7gqdhi.mongodb.net/" # Your MongoDB connection string
+
+# Optional: Automatic scaling settings
+automatic_scaling:
+  min_instances: 0  # Scale down to 0 instances when not in use (can cause cold starts)
+  max_instances: 1  # Maximum instances (adjust based on expected load and budget)
+  target_cpu_utilization: 0.65
+  target_throughput_utilization: 0.65
+  max_concurrent_requests: 80
